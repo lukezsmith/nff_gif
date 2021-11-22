@@ -169,6 +169,9 @@ const Home: NextPage = () => {
       <div className="visible sm:invisible">
         This tool does not work on mobile unfortunately :(
       </div>
+      <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
+      <a href="https://twitter.com/lukezsmith" className="underline">@lukezsmith</a>
+    </footer>
     </div>
   ) : (
     <div className="bg-white text-center flex flex-col items-center">
@@ -179,6 +182,9 @@ const Home: NextPage = () => {
       </Head>
 
       <h1 className="text-4xl bold my-10 ">Loading...</h1>
+      <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
+      <a href="https://twitter.com/lukezsmith" className="underline">@lukezsmith</a>
+    </footer>
     </div>
   );
 };
