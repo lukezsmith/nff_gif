@@ -85,7 +85,7 @@ const Home: NextPage = () => {
           link.href = url;
           link.setAttribute("download", "image.gif");
           document.body.appendChild(link);
-          link.click();
+          // link.click();
         });
       })
       .catch((err) => {
