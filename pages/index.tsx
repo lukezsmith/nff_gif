@@ -4,6 +4,7 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import React, { useEffect, useState } from "react";
 import { DownloadBtn } from "../components/DownloadBtn";
 import { Gif } from "../components/Gif";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const ffmpeg = createFFmpeg({ log: true });
 
@@ -14,6 +15,7 @@ const Home: NextPage = () => {
   const [ready, setReady] = useState(false);
   const [videoURL, setVideoURL] = useState("");
   const [gif, setGif] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     await ffmpeg.load();
@@ -26,6 +28,11 @@ const Home: NextPage = () => {
   }, []);
 
   const getVideoURL = async (e: string) => {
+    let tokenId = parseInt(e);
+    if (tokenId < 0 || tokenId > 10000 || isNaN(tokenId)) {
+      alert("Invalid id!");
+      return;
+    }
     fetch(ipfsURL + e + ".json").then(function (response) {
       if (response.status !== 200) {
         console.log(
@@ -48,6 +55,7 @@ const Home: NextPage = () => {
   };
 
   const convertToGif = async () => {
+    setLoading(true);
     // Write the .mp4 to the FFmpeg file system
     ffmpeg.FS("writeFile", "video1.mp4", await fetchFile(videoURL));
 
@@ -67,6 +75,7 @@ const Home: NextPage = () => {
     const url = URL.createObjectURL(
       new Blob([data.buffer], { type: "image/gif" })
     );
+    setLoading(false);
     setGif(url);
   };
 
@@ -100,21 +109,33 @@ const Home: NextPage = () => {
       </Head>
 
       <h1 className="text-lg lg:text-4xl bold my-10 ">
-        Non Fungible Fungi GIF Generator
+        🍄 Non Fungible Fungi GIF Generator 🍄
       </h1>
       <div className="invisible sm:visible grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div className="">
             <h1 className="text-md lg:text-xl bold">Enter TokenID: </h1>
             <input
+              id="token-input"
               placeholder="Enter your TokenID here..."
-              className="bg-gray-300 placeholder-gray-800::placeholder my-5"
+              className="bg-gray-300 p-1 placeholder-gray-800::placeholder my-5"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   getVideoURL((e.target as HTMLTextAreaElement).value);
                 }
               }}
             ></input>
+            <button
+              className="cursor-pointer rounded-none ml-2 p-1 bg-gray-300 rounded-md hover:bg-gray-400"
+              onClick={() =>
+                getVideoURL(
+                  (document.getElementById("token-input") as HTMLInputElement)!
+                    .value
+                )
+              }
+            >
+              Enter
+            </button>
           </div>
           {videoURL !== "" ? (
             <div>
@@ -135,9 +156,9 @@ const Home: NextPage = () => {
           )}
         </div>
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
-          <div>
-            {/* <h1 className="text-xl bold">Result:</h1> */}
+          <div className="flex flex-col items-center">
             <h1 className="text-md lg:text-xl bold">Result: </h1>
+            <ClipLoader loading={loading} />
             <input
               placeholder="result"
               className="invisible bg-gray-300 placeholder-gray-800::placeholder my-5"
@@ -168,8 +189,10 @@ const Home: NextPage = () => {
         This tool does not work on mobile unfortunately :(
       </div>
       <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
-      <a href="https://twitter.com/lukezsmith" className="underline">@lukezsmith</a>
-    </footer>
+        <a href="https://twitter.com/lukezsmith" className="underline">
+          @lukezsmith
+        </a>
+      </footer>
     </div>
   ) : (
     <div className="bg-white text-center flex flex-col items-center">
@@ -181,8 +204,10 @@ const Home: NextPage = () => {
 
       <h1 className="text-4xl bold my-10 ">Loading...</h1>
       <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
-      <a href="https://twitter.com/lukezsmith" className="underline">@lukezsmith</a>
-    </footer>
+        <a href="https://twitter.com/lukezsmith" className="underline">
+          @lukezsmith
+        </a>
+      </footer>
     </div>
   );
 };
