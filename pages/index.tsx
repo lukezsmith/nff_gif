@@ -1,13 +1,9 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import React, { useEffect, useState } from "react";
 import { DownloadBtn } from "../components/DownloadBtn";
 import { Gif } from "../components/Gif";
-import { InputTokenID } from "../components/InputTokenID";
-import { InputVideo } from "../components/InputVideo";
 
 const ffmpeg = createFFmpeg({ log: true });
 
@@ -76,9 +72,9 @@ const Home: NextPage = () => {
     setGif(url);
   };
 
-  const download = (e) => {
-    console.log(e.target.href);
-    fetch(e.target.href, {
+  const download = (e: React.MouseEvent) => {
+    console.log((e.target as HTMLAnchorElement).href);
+    fetch((e.target as HTMLAnchorElement).href, {
       method: "GET",
       headers: {},
     })
@@ -123,20 +119,22 @@ const Home: NextPage = () => {
             ></input>
           </div>
           {videoURL !== "" ? (
-            <div className="lg:my-10">
-              <video controls crossOrigin="anonymous" src={videoURL} />
+            <div>
+              <div className="lg:my-10">
+                <video controls crossOrigin="anonymous" src={videoURL} />
+              </div>
+              <div>
+                <a
+                  className="cursor-pointer my-3 lg:my-0 p-3 bg-gray-300 rounded-md hover:bg-gray-400"
+                  onClick={convertToGif}
+                >
+                  Convert
+                </a>
+              </div>
             </div>
           ) : (
             ""
           )}
-          <div>
-            <a
-              className="my-3 lg:my-0 p-3 bg-gray-300 rounded-md hover:bg-gray-400"
-              onClick={convertToGif}
-            >
-              Convert
-            </a>
-          </div>
         </div>
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div>
