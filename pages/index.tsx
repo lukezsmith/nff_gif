@@ -56,12 +56,10 @@ const Home: NextPage = () => {
     await ffmpeg.run(
       "-i",
       "video1.mp4",
-      // "-t",
-      // "2",
-      // "-ss",
-      // "2.0",
-      "-f",
-      "gif",
+      "-t",
+      "2",
+      "-vf",
+      "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
       "out.gif"
     );
     // Read the .gif file back from the FFmpeg file system
