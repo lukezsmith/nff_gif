@@ -98,26 +98,30 @@ const Home: NextPage = () => {
   };
 
   return ready ? (
-    <div className="bg-white text-center">
+    <div className="bg-white text-center flex flex-col align-center">
       <Head>
         <title>NFF GIF</title>
         <meta name="description" content="NFF GIF" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1 className="text-4xl bold my-10 ">Non Fungible Fungi Gif Generator</h1>
-      <div className="grid grid-cols-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
-        <div className="grid-rows-3  lg:px-10 my-10 flex flex-col justify-center">
-          <h1 className="text-xl bold">Enter TokenID: </h1>
-          <input
-            placeholder="Enter your TokenID here..."
-            className="bg-gray-300 placeholder-gray-800::placeholder"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                getVideoURL((e.target as HTMLTextAreaElement).value);
-              }
-            }}
-          ></input>
+      <h1 className="text-lg lg:text-4xl bold my-10 ">
+        Non Fungible Fungi GIF Generator
+      </h1>
+      <div className="grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
+        <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
+          <div className="">
+            <h1 className="text-md lg:text-xl bold">Enter TokenID: </h1>
+            <input
+              placeholder="Enter your TokenID here..."
+              className="bg-gray-300 placeholder-gray-800::placeholder my-5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  getVideoURL((e.target as HTMLTextAreaElement).value);
+                }
+              }}
+            ></input>
+          </div>
           {videoURL !== "" ? (
             <div className="lg:my-10">
               <video controls crossOrigin="anonymous" src={videoURL} />
@@ -126,25 +130,55 @@ const Home: NextPage = () => {
             ""
           )}
           <div>
-            <button
-              className="my-5 p-3 bg-gray-300 rounded-md hover:bg-gray-400"
+            <a
+              className="my-3 lg:my-0 p-3 bg-gray-300 rounded-md hover:bg-gray-400"
               onClick={convertToGif}
             >
               Convert
-            </button>
+            </a>
           </div>
         </div>
-        <div className="grid-rows-3 lg:px-10 my-10 flex flex-col justify-center">
+        <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div>
-          <h1 className="text-xl bold">Result</h1>
+            {/* <h1 className="text-xl bold">Result:</h1> */}
+            <h1 className="text-md lg:text-xl bold">Result: </h1>
+            <input
+              placeholder="result"
+              className="invisible bg-gray-300 placeholder-gray-800::placeholder my-5"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  getVideoURL((e.target as HTMLTextAreaElement).value);
+                }
+              }}
+            ></input>
           </div>
-            {gif !== "" ? gif && <div className="lg:my-10"><Gif gif={gif} /></div> : ""}
-            {gif !== "" ? <div><DownloadBtn gif={gif} download={download} /> </div>: ""}
+          {gif !== ""
+            ? gif && (
+                <div className="lg:my-10">
+                  <Gif gif={gif} />
+                </div>
+              )
+            : ""}
+          {gif !== "" ? (
+            <div>
+              <DownloadBtn gif={gif} download={download} />{" "}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </div>
   ) : (
-    <p>Loading...</p>
+    <div className="bg-white text-center">
+      <Head>
+        <title>NFF GIF</title>
+        <meta name="description" content="NFF GIF" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <h1 className="text-4xl bold my-10 ">Loading...</h1>
+    </div>
   );
 };
 
