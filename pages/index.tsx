@@ -147,7 +147,7 @@ const Home: NextPage = () => {
                   className="cursor-pointer p-3 bg-gray-300 rounded-md hover:bg-gray-400"
                   onClick={convertToGif}
                 >
-                  Convert
+                  Convert to GIF
                 </a>
               </div>
             </div>
