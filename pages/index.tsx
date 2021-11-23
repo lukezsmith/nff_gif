@@ -79,7 +79,7 @@ const Home: NextPage = () => {
     setGif(url);
   };
 
-  const download = (e: React.MouseEvent) => {
+  const download = (e: React.MouseEvent, type:string) => {
     console.log((e.target as HTMLAnchorElement).href);
     fetch((e.target as HTMLAnchorElement).href, {
       method: "GET",
@@ -90,7 +90,13 @@ const Home: NextPage = () => {
           const url = window.URL.createObjectURL(new Blob([buffer]));
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", "image.gif");
+          if(type === "gif"){
+            
+            link.setAttribute("download", "image.gif");
+          }else{
+            link.setAttribute("download", "video.mp4");
+
+          }
           document.body.appendChild(link);
           // link.click();
         });
@@ -143,12 +149,15 @@ const Home: NextPage = () => {
                 <video controls crossOrigin="anonymous" src={videoURL} />
               </div>
               <div className=" my-3 lg:my-0 ">
+                {/* video download btn */}
+              {/* <DownloadBtn url={videoURL} type="video" download={download} />{" "} */}
                 <a
                   className="cursor-pointer p-3 bg-gray-300 rounded-md hover:bg-gray-400"
                   onClick={convertToGif}
                 >
                   Convert to GIF
                 </a>
+
               </div>
             </div>
           ) : (
@@ -178,7 +187,7 @@ const Home: NextPage = () => {
             : ""}
           {gif !== "" ? (
             <div className=" my-3 lg:my-0 ">
-              <DownloadBtn gif={gif} download={download} />{" "}
+              <DownloadBtn url={gif} type="gif" download={download} />{" "}
             </div>
           ) : (
             ""
@@ -205,7 +214,10 @@ const Home: NextPage = () => {
       <h1 className="text-lg lg:text-4xl bold my-10 ">
         🍄 Non Fungible Fungi GIF Generator 🍄
       </h1>
-      <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1>
+      <div>
+      {/* <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1> */}
+      <ClipLoader loading={true} />
+      </div>
       <div className="visible sm:invisible">
         This tool does not work on mobile unfortunately :(
       </div>
