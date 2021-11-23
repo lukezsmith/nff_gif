@@ -111,7 +111,7 @@ const Home: NextPage = () => {
       <h1 className="text-lg lg:text-4xl bold my-10 ">
         🍄 Non Fungible Fungi GIF Generator 🍄
       </h1>
-      <div className="invisible md:visible grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
+      <div className="invisible sm:visible grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div className="">
             <h1 className="text-md lg:text-xl bold">Enter TokenID: </h1>
@@ -185,7 +185,7 @@ const Home: NextPage = () => {
           )}
         </div>
       </div>
-      <div className="visible md:invisible">
+      <div className="visible sm:invisible">
         This tool does not work on mobile unfortunately :(
       </div>
       <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
@@ -197,18 +197,25 @@ const Home: NextPage = () => {
   ) : (
     <div className="bg-white text-center flex flex-col items-center">
       <Head>
-        <title>NFF GIF</title>
-        <meta name="description" content="NFF GIF" />
+      <title>🍄 Non Fungible Fungi GIF Generator 🍄</title>
+        <meta name="description" content="View your Shroom & Generate a downloadable GIF" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1 className="text-4xl bold my-10 ">Loading...</h1>
+      <h1 className="text-lg lg:text-4xl bold my-10 ">
+        🍄 Non Fungible Fungi GIF Generator 🍄
+      </h1>
+      <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1>
+      <div className="visible sm:invisible">
+        This tool does not work on mobile unfortunately :(
+      </div>
       <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
         <a href="https://twitter.com/lukezsmith" className="underline">
           @lukezsmith
         </a>
       </footer>
     </div>
+    
   );
 };
 
