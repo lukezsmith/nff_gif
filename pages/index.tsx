@@ -103,8 +103,8 @@ const Home: NextPage = () => {
   return ready ? (
     <div id="main" className="bg-white text-center flex flex-col items-center">
       <Head>
-        <title>NFF GIF</title>
-        <meta name="description" content="NFF GIF" />
+        <title>Non Fungible Fungi GIF Generator</title>
+        <meta name="description" content="View your Shroom & Generate a downloadable GIF" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
