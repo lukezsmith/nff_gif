@@ -16,6 +16,7 @@ const Home: NextPage = () => {
   const [videoURL, setVideoURL] = useState("");
   const [gif, setGif] = useState("");
   const [loading, setLoading] = useState(false);
+  const [gifDuration, setGifDuration] = useState("2.2");
 
   const load = async () => {
     await ffmpeg.load();
@@ -50,6 +51,10 @@ const Home: NextPage = () => {
           "/" +
           data.image.split("/")[3];
         setVideoURL(videoUrl);
+
+        let index = data.attributes.findIndex((x: { trait_type: string; }) => x.trait_type ==="Species");
+        setGifDuration(data.attributes[index].value === "mire-able" ? "2" : "2.2");
+
       });
     });
   };
@@ -65,7 +70,7 @@ const Home: NextPage = () => {
       "-i",
       "video1.mp4",
       "-t",
-      "2",
+      "2.2",
       "-vf",
       "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
       "out.gif"
