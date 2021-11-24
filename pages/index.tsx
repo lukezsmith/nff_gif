@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { DownloadBtn } from "../components/DownloadBtn";
 import { Gif } from "../components/Gif";
 import ClipLoader from "react-spinners/ClipLoader";
+import Switch from "react-switch";
 
 const ffmpeg = createFFmpeg({ log: true });
 
@@ -17,6 +18,7 @@ const Home: NextPage = () => {
   const [gif, setGif] = useState("");
   const [loading, setLoading] = useState(false);
   const [gifDuration, setGifDuration] = useState("2.2");
+  const [reversed, setReversed] = useState(false);
 
   const load = async () => {
     await ffmpeg.load();
@@ -52,9 +54,12 @@ const Home: NextPage = () => {
           data.image.split("/")[3];
         setVideoURL(videoUrl);
 
-        let index = data.attributes.findIndex((x: { trait_type: string; }) => x.trait_type ==="Species");
-        setGifDuration(data.attributes[index].value === "mire-able" ? "2" : "2.2");
-
+        let index = data.attributes.findIndex(
+          (x: { trait_type: string }) => x.trait_type === "Species"
+        );
+        setGifDuration(
+          data.attributes[index].value === "mire-able" ? "2" : "2.2"
+        );
       });
     });
   };
@@ -64,6 +69,16 @@ const Home: NextPage = () => {
     // Write the .mp4 to the FFmpeg file system
     ffmpeg.FS("writeFile", "video1.mp4", await fetchFile(videoURL));
 
+    let gifConfig = "";
+
+    if (!reversed) {
+      gifConfig =
+        "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+    } else {
+      gifConfig =
+        "fps=45,reverse, scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+    }
+
     // Run the FFmpeg command-line tool, converting
     // the .mp4 into .gif file
     await ffmpeg.run(
@@ -72,7 +87,7 @@ const Home: NextPage = () => {
       "-t",
       "2.2",
       "-vf",
-      "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse",
+      gifConfig,
       "out.gif"
     );
     // Read the .gif file back from the FFmpeg file system
@@ -84,7 +99,7 @@ const Home: NextPage = () => {
     setGif(url);
   };
 
-  const download = (e: React.MouseEvent, type:string) => {
+  const download = (e: React.MouseEvent, type: string) => {
     console.log((e.target as HTMLAnchorElement).href);
     fetch((e.target as HTMLAnchorElement).href, {
       method: "GET",
@@ -95,12 +110,10 @@ const Home: NextPage = () => {
           const url = window.URL.createObjectURL(new Blob([buffer]));
           const link = document.createElement("a");
           link.href = url;
-          if(type === "gif"){
-            
+          if (type === "gif") {
             link.setAttribute("download", "image.gif");
-          }else{
+          } else {
             link.setAttribute("download", "video.mp4");
-
           }
           document.body.appendChild(link);
           // link.click();
@@ -115,14 +128,17 @@ const Home: NextPage = () => {
     <div id="main" className="bg-white text-center flex flex-col items-center">
       <Head>
         <title>Non Fungible Fungi GIF Generator</title>
-        <meta name="description" content="View your Shroom & Generate a downloadable GIF" />
+        <meta
+          name="description"
+          content="View your Shroom & Generate a downloadable GIF"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <h1 className="text-lg lg:text-4xl bold my-10 ">
         🍄 Non Fungible Fungi GIF Generator 🍄
       </h1>
-      <div className="invisible sm:visible grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-10">
+      <div className="invisible sm:visible grid grid-cols-2 mx-2 lg:mx-64 bg-gray-100 rounded-xl lg:p-8">
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div className="">
             <h1 className="text-md lg:text-xl bold">Enter TokenID: </h1>
@@ -155,15 +171,31 @@ const Home: NextPage = () => {
               </div>
               <div className=" my-3 lg:my-0 ">
                 {/* video download btn */}
-              {/* <DownloadBtn url={videoURL} type="video" download={download} />{" "} */}
+                {/* <DownloadBtn url={videoURL} type="video" download={download} />{" "} */}
                 <a
                   className="cursor-pointer p-3 bg-gray-300 rounded-md hover:bg-gray-400"
                   onClick={convertToGif}
                 >
                   Convert to GIF
                 </a>
-
               </div>
+              <label className="flex align-center justify-center lg:mt-10">
+                <span>Moonwalking shroom?</span>
+                <Switch
+                  checkedIcon={false}
+                  uncheckedIcon={false}
+                  className="ml-5"
+                  onChange={(e) => {
+                    console.log(e);
+                    if (reversed) {
+                      setReversed(false);
+                    } else {
+                      setReversed(true);
+                    }
+                  }}
+                  checked={reversed}
+                />
+              </label>
             </div>
           ) : (
             ""
@@ -191,8 +223,27 @@ const Home: NextPage = () => {
               )
             : ""}
           {gif !== "" ? (
-            <div className=" my-3 lg:my-0 ">
-              <DownloadBtn url={gif} type="gif" download={download} />{" "}
+            <div>
+              <div className=" my-3 lg:my-0 ">
+                <DownloadBtn url={gif} type="gif" download={download} />{" "}
+              </div>
+              <label className="invisible flex align-center justify-center lg:mt-10">
+                <span>Moonwalking shroom?</span>
+                <Switch
+                  checkedIcon={false}
+                  uncheckedIcon={false}
+                  className="ml-5"
+                  onChange={(e) => {
+                    console.log(e);
+                    if (reversed) {
+                      setReversed(false);
+                    } else {
+                      setReversed(true);
+                    }
+                  }}
+                  checked={reversed}
+                />
+              </label>
             </div>
           ) : (
             ""
@@ -211,8 +262,11 @@ const Home: NextPage = () => {
   ) : (
     <div className="bg-white text-center flex flex-col items-center">
       <Head>
-      <title>🍄 Non Fungible Fungi GIF Generator 🍄</title>
-        <meta name="description" content="View your Shroom & Generate a downloadable GIF" />
+        <title>🍄 Non Fungible Fungi GIF Generator 🍄</title>
+        <meta
+          name="description"
+          content="View your Shroom & Generate a downloadable GIF"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -220,8 +274,8 @@ const Home: NextPage = () => {
         🍄 Non Fungible Fungi GIF Generator 🍄
       </h1>
       <div>
-      {/* <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1> */}
-      <ClipLoader loading={true} />
+        {/* <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1> */}
+        <ClipLoader loading={true} />
       </div>
       <div className="visible sm:invisible">
         This tool does not work on mobile unfortunately :(
@@ -232,7 +286,6 @@ const Home: NextPage = () => {
         </a>
       </footer>
     </div>
-    
   );
 };
 
