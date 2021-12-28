@@ -19,6 +19,7 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [gifDuration, setGifDuration] = useState("2.2");
   const [reversed, setReversed] = useState(false);
+  const [flipped, setFlipped] = useState(false);
 
   const load = async () => {
     await ffmpeg.load();
@@ -72,12 +73,24 @@ const Home: NextPage = () => {
     let gifConfig = "";
 
     if (!reversed) {
-      gifConfig =
-        "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+      if(!flipped){
+        gifConfig =
+          "fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+      }else{
+        gifConfig =
+        "hflip,fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+      }
     } else {
-      gifConfig =
-        "fps=45,reverse, scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+      if (!flipped){
+        gifConfig =
+          "fps=45,reverse, scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+      }else{
+        gifConfig =
+        "hflip,reverse, fps=45,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse";
+
+      }
     }
+  
 
     // Run the FFmpeg command-line tool, converting
     // the .mp4 into .gif file
@@ -196,6 +209,23 @@ const Home: NextPage = () => {
                   checked={reversed}
                 />
               </label>
+              <label className="flex align-center justify-center lg:mt-10">
+                <span>Flipped shroom?</span>
+                <Switch
+                  checkedIcon={false}
+                  uncheckedIcon={false}
+                  className="ml-5"
+                  onChange={(e) => {
+                    console.log(e);
+                    if (flipped) {
+                      setFlipped(false);
+                    } else {
+                      setFlipped(true);
+                    }
+                  }}
+                  checked={flipped}
+                />
+              </label>
             </div>
           ) : (
             ""
@@ -229,6 +259,23 @@ const Home: NextPage = () => {
               </div>
               <label className="invisible flex align-center justify-center lg:mt-10">
                 <span>Moonwalking shroom?</span>
+                <Switch
+                  checkedIcon={false}
+                  uncheckedIcon={false}
+                  className="ml-5"
+                  onChange={(e) => {
+                    console.log(e);
+                    if (reversed) {
+                      setReversed(false);
+                    } else {
+                      setReversed(true);
+                    }
+                  }}
+                  checked={reversed}
+                />
+              </label>
+              <label className="invisible flex align-center justify-center lg:mt-10">
+                <span>Flipped shroom?</span>
                 <Switch
                   checkedIcon={false}
                   uncheckedIcon={false}
