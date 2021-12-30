@@ -73,11 +73,13 @@ const Home: NextPage = () => {
       !window["safari" as keyof Window] ||
         window["safari" as keyof Window].pushNotification
     );
-    if (isSafari) {
+
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isSafari || isMobile) {
       setCompatible(false);
       setLoading(false);
       return;
-    } else {
+    }else {
       await ffmpeg.load();
       setCompatible(true);
       setLoading(false);
