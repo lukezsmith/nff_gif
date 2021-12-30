@@ -54,7 +54,8 @@ async function extractFramesFromVideo(videoUrl: string, fps = 30) {
 }
 
 const Home: NextPage = () => {
-  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [compatible, setCompatible] = useState(false);
   const [videoURL, setVideoURL] = useState("");
   const [gif, setGif] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
@@ -66,8 +67,21 @@ const Home: NextPage = () => {
   const [headTrait, setHeadTrait] = useState("");
 
   const load = async () => {
-    await ffmpeg.load();
-    setReady(true);
+    var isSafari = (function (p) {
+      return p.toString() === "[object SafariRemoteNotification]";
+    })(
+      !window["safari" as keyof Window] ||
+        window["safari" as keyof Window].pushNotification
+    );
+    if (isSafari) {
+      setCompatible(false);
+      setLoading(false);
+      return;
+    } else {
+      await ffmpeg.load();
+      setCompatible(true);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -185,7 +199,6 @@ const Home: NextPage = () => {
         setVideoLoading(false);
       });
     });
-    
   };
 
   const convertToGif = async () => {
@@ -295,7 +308,8 @@ const Home: NextPage = () => {
           case "leaf":
             // 8856
             canvasContext!.scale(1.3, 1.3);
-            canvasContext!.drawImage(temp, -75, -20, 500, 500);
+            // canvasContext!.fillRect(0, 0, 500,500);
+            canvasContext!.drawImage(temp, -75, 0, 500, 500);
             break;
           case "goggles":
             // 5928
@@ -354,8 +368,18 @@ const Home: NextPage = () => {
         console.log(err);
       });
   };
-
-  return ready ? (
+  if (loading) {
+    return (
+      <div
+        style={{marginTop: "12%"}}
+        id="main"
+        className="bg-white text-center flex flex-col items-center"
+      >
+        <ClipLoader loading={true} />
+      </div>
+    );
+  }
+  return compatible ? (
     <div id="main" className="bg-white text-center flex flex-col items-center">
       <Head>
         <title>Non Fungible Fungi GIF Generator</title>
@@ -399,7 +423,7 @@ const Home: NextPage = () => {
           {videoURL !== "" ? (
             <div>
               <div className="lg:my-10">
-              <ClipLoader loading={videoLoading} />
+                <ClipLoader loading={videoLoading} />
                 <video
                   id="vid"
                   controls
@@ -554,10 +578,9 @@ const Home: NextPage = () => {
       </h1>
       <div>
         {/* <h1 className="invisible sm:visible text-lg bold my-10 ">Loading...</h1> */}
-        <ClipLoader loading={true} />
       </div>
-      <div className="visible sm:invisible">
-        This tool does not work on mobile unfortunately :(
+      <div className="visible">
+        This tool does not work on mobile or Safari unfortunately :(
       </div>
       <footer className="absolute bottom-5 right-5 text-xs text-gray-400">
         <a href="https://twitter.com/lukezsmith" className="underline">
