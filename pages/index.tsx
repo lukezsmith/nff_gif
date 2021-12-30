@@ -7,9 +7,6 @@ import { Gif } from "../components/Gif";
 import ClipLoader from "react-spinners/ClipLoader";
 import Switch from "react-switch";
 import captureVideoFrame from "capture-video-frame";
-import Cropper from "cropperjs";
-
-// import extractVideoFrames from 'extract-video-frames';
 
 const ffmpeg = createFFmpeg({ log: true });
 
@@ -23,9 +20,10 @@ async function extractFramesFromVideo(videoUrl: string, fps = 30) {
     let videoObjectUrl = URL.createObjectURL(videoBlob);
     let video = document.createElement("video");
 
-    let seekResolve: { (): void; (value: unknown): void };
+    // let seekResolve: { (): void; (value: unknown): void; };
+    let seekResolve: (value: unknown) => void;
     video.addEventListener("seeked", async function () {
-      if (seekResolve) seekResolve();
+      if (seekResolve) seekResolve(null);
     });
 
     video.src = videoObjectUrl;
@@ -46,27 +44,12 @@ async function extractFramesFromVideo(videoUrl: string, fps = 30) {
     canvas.width = w;
     canvas.height = h;
 
-    // let frames = [];
-    let interval = 1 / fps;
-    let currentTime = 0;
-
-    // while (currentTime < duration) {
-    //   video.currentTime = currentTime;
-    //   await new Promise((r) => (seekResolve = r));
-
-    //   context!.drawImage(video, 0, 0, w, h);
-    //   let base64ImageData = canvas.toDataURL();
-    //   frames.push(base64ImageData);
-
-    //   currentTime += interval;
-    // }
     video.currentTime = 22.5 * (1/fps);
     await new Promise((r) => (seekResolve = r));
     context!.drawImage(video, 0, 0, w, h);
     let base64ImageData = canvas.toDataURL();
     let frame = base64ImageData;
     resolve(frame)
-    // resolve(frames);
   });
 }
 
@@ -257,7 +240,7 @@ const Home: NextPage = () => {
     
     }else{
       frame = await extractFramesFromVideo(videoURL);
-      temp.src = frame;
+      temp.src = String(frame);
 
     }
     setTimeout(() => {
