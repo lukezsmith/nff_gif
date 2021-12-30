@@ -114,3 +114,8 @@
     flex-direction: column;
   }
 }
+
+.pfp-hidden{
+  /* visibility: hidden; */
+  display:none !important;
+}
