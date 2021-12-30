@@ -44,12 +44,12 @@ async function extractFramesFromVideo(videoUrl: string, fps = 30) {
     canvas.width = w;
     canvas.height = h;
 
-    video.currentTime = 22.5 * (1/fps);
+    video.currentTime = 22.5 * (1 / fps);
     await new Promise((r) => (seekResolve = r));
     context!.drawImage(video, 0, 0, w, h);
     let base64ImageData = canvas.toDataURL();
     let frame = base64ImageData;
-    resolve(frame)
+    resolve(frame);
   });
 }
 
@@ -57,7 +57,8 @@ const Home: NextPage = () => {
   const [ready, setReady] = useState(false);
   const [videoURL, setVideoURL] = useState("");
   const [gif, setGif] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [conversionLoading, setConversionLoading] = useState(false);
   const [gifDuration, setGifDuration] = useState("2.2");
   const [reversed, setReversed] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -74,9 +75,11 @@ const Home: NextPage = () => {
   }, []);
 
   const getVideoURL = async (e: string) => {
+    setVideoLoading(true);
     let tokenId = parseInt(e);
     if (tokenId < 0 || tokenId > 10000 || isNaN(tokenId)) {
       alert("Invalid id!");
+      setVideoLoading(false);
       return;
     }
     fetch(ipfsURL + e + ".json").then(function (response) {
@@ -84,6 +87,7 @@ const Home: NextPage = () => {
         console.log(
           "Looks like there was a problem. Status Code: " + response.status
         );
+        setVideoLoading(false);
         return;
       }
 
@@ -140,50 +144,52 @@ const Home: NextPage = () => {
         } else {
           setisMireable(false);
           // setHeadTrait("");
-                    // check for head traits
-                    if (
-                      data.attributes.some(
-                        (x: { value: string }) => x.value.includes("leaf")
-                      )
-                    ) {
-                      setHeadTrait("leaf");
-                    } else if (
-                      data.attributes.some(
-                        (x: { value: string }) => x.value === "goggles"
-                      )
-                    ) {
-                      setHeadTrait("goggles");
-                    } else if (
-                      data.attributes.some(
-                        (x: { value: string }) => x.value === "lodged sushi knife"
-                      )
-                    ) {
-                      setHeadTrait("knife");
-                    } else if (
-                      data.attributes.some(
-                        (x: { value: string }) => x.value === "top hat"
-                      )
-                    ) {
-                      setHeadTrait("top hat");
-                    } else if (
-                      data.attributes.some(
-                        (x: { value: string }) => x.value === "aviators"
-                      )
-                    ) {
-                      setHeadTrait("aviators");
-                    } else {
-                      setHeadTrait("");
-                    }
+          // check for head traits
+          if (
+            data.attributes.some((x: { value: string }) =>
+              x.value.includes("leaf")
+            )
+          ) {
+            setHeadTrait("leaf");
+          } else if (
+            data.attributes.some(
+              (x: { value: string }) => x.value === "goggles"
+            )
+          ) {
+            setHeadTrait("goggles");
+          } else if (
+            data.attributes.some(
+              (x: { value: string }) => x.value === "lodged sushi knife"
+            )
+          ) {
+            setHeadTrait("knife");
+          } else if (
+            data.attributes.some(
+              (x: { value: string }) => x.value === "top hat"
+            )
+          ) {
+            setHeadTrait("top hat");
+          } else if (
+            data.attributes.some(
+              (x: { value: string }) => x.value === "aviators"
+            )
+          ) {
+            setHeadTrait("aviators");
+          } else {
+            setHeadTrait("");
+          }
         }
         setGifDuration(
           data.attributes[index].value === "mire-able" ? "2" : "2.2"
         );
+        setVideoLoading(false);
       });
     });
+    
   };
 
   const convertToGif = async () => {
-    setLoading(true);
+    setConversionLoading(true);
     // Write the .mp4 to the FFmpeg file system
     ffmpeg.FS("writeFile", "video1.mp4", await fetchFile(videoURL));
 
@@ -223,25 +229,23 @@ const Home: NextPage = () => {
     const url = URL.createObjectURL(
       new Blob([data.buffer], { type: "image/gif" })
     );
-    setLoading(false);
+    setConversionLoading(false);
     setGif(url);
   };
 
   const generatePFP = async () => {
-    setLoading(true);
+    setConversionLoading(true);
 
     let frame;
     var temp = new Image();
     temp.className = "pfp-hidden";
-  
-    if (isMire){
+
+    if (isMire) {
       frame = captureVideoFrame("vid", "png", 1);
       temp.src = frame.dataUri;
-    
-    }else{
+    } else {
       frame = await extractFramesFromVideo(videoURL);
       temp.src = String(frame);
-
     }
     setTimeout(() => {
       var canvas = document.createElement("canvas") as HTMLCanvasElement;
@@ -258,31 +262,31 @@ const Home: NextPage = () => {
           case "pipe":
             // 5792
             canvasContext!.scale(1.4, 1.4);
-            canvasContext!.drawImage(temp, -35, -10, 500, 500);
+            canvasContext!.drawImage(temp, -35, 0, 500, 500);
             break;
           case "cig":
             // 235
             canvasContext!.scale(1.5, 1.5);
-            canvasContext!.drawImage(temp, -70, -10, 500, 500);
+            canvasContext!.drawImage(temp, -70, 0, 500, 500);
             break;
           case "saw":
             // 8181
             canvasContext!.scale(1.45, 1.45);
-            canvasContext!.drawImage(temp, -70, -10, 500, 500);
+            canvasContext!.drawImage(temp, -70, 0, 500, 500);
             break;
           case "btc":
             // 1405
             canvasContext!.scale(1.5, 1.5);
-            canvasContext!.drawImage(temp, -75, -10, 500, 500);
+            canvasContext!.drawImage(temp, -75, 0, 500, 500);
             break;
           case "eth":
             // 4087
             canvasContext!.scale(1.45, 1.45);
-            canvasContext!.drawImage(temp, -85, -10, 500, 500);
+            canvasContext!.drawImage(temp, -85, 0, 500, 500);
             break;
           default:
             canvasContext!.scale(1.65, 1.65);
-            canvasContext!.drawImage(temp, -85, -10, 500, 500);
+            canvasContext!.drawImage(temp, -85, 0, 500, 500);
             break;
         }
       } else {
@@ -318,9 +322,8 @@ const Home: NextPage = () => {
             canvasContext!.drawImage(temp, -75, -40, 500, 500);
             break;
         }
-
       }
-      setLoading(false);
+      setConversionLoading(false);
       setGif(canvas.toDataURL("image/png"));
       canvas.remove();
       temp.remove();
@@ -376,6 +379,7 @@ const Home: NextPage = () => {
               className="bg-gray-300 p-1 placeholder-gray-800::placeholder my-5"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
+                  // setVideoLoading(true);
                   getVideoURL((e.target as HTMLTextAreaElement).value);
                 }
               }}
@@ -395,6 +399,7 @@ const Home: NextPage = () => {
           {videoURL !== "" ? (
             <div>
               <div className="lg:my-10">
+              <ClipLoader loading={videoLoading} />
                 <video
                   id="vid"
                   controls
@@ -460,21 +465,16 @@ const Home: NextPage = () => {
               </label>
             </div>
           ) : (
-            ""
+            <ClipLoader loading={videoLoading} />
           )}
         </div>
         <div className="grid-rows-3 mx-10 lg:mx-20 my-10 lg:my-0 flex flex-col justify-center">
           <div className="flex flex-col items-center">
             <h1 className="text-md lg:text-xl bold">Result: </h1>
-            <ClipLoader loading={loading} />
+            <ClipLoader loading={conversionLoading} />
             <input
               placeholder="result"
               className="invisible bg-gray-300 placeholder-gray-800::placeholder my-5"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  getVideoURL((e.target as HTMLTextAreaElement).value);
-                }
-              }}
             ></input>
           </div>
           {gif !== ""
