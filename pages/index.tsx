@@ -11,7 +11,7 @@ import captureVideoFrame from "capture-video-frame";
 const ffmpeg = createFFmpeg({ log: true });
 
 const ipfsURL =
-  "https://ipfs.io/ipfs/QmUZxB4PmiwWa524ScscBsXiMhnLHAsB6N9JHtM4jv5Ppu/";
+  "https://ipfs.io/ipfs/QmX9GuUT4vKkYsiF8iVCPKCHsrewfsnk2tkaXmQ1L8fm4G/";
 
 async function extractFramesFromVideo(videoUrl: string, fps = 30) {
   return new Promise(async (resolve) => {
@@ -60,10 +60,11 @@ const Home: NextPage = () => {
   const [gif, setGif] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
   const [conversionLoading, setConversionLoading] = useState(false);
-  const [gifDuration, setGifDuration] = useState("2.2");
+  const [gifDuration, setGifDuration] = useState("");
   const [reversed, setReversed] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [isMire, setisMireable] = useState(false);
+  const [isMagic, setisMagic] = useState(false);
   const [headTrait, setHeadTrait] = useState("");
 
   const load = async () => {
@@ -159,44 +160,47 @@ const Home: NextPage = () => {
           }
         } else {
           setisMireable(false);
-          // setHeadTrait("");
-          // check for head traits
-          if (
-            data.attributes.some((x: { value: string }) =>
-              x.value.includes("leaf")
-            )
-          ) {
-            setHeadTrait("leaf");
-          } else if (
-            data.attributes.some(
-              (x: { value: string }) => x.value === "goggles"
-            )
-          ) {
-            setHeadTrait("goggles");
-          } else if (
-            data.attributes.some(
-              (x: { value: string }) => x.value === "lodged sushi knife"
-            )
-          ) {
-            setHeadTrait("knife");
-          } else if (
-            data.attributes.some(
-              (x: { value: string }) => x.value === "top hat"
-            )
-          ) {
-            setHeadTrait("top hat");
-          } else if (
-            data.attributes.some(
-              (x: { value: string }) => x.value === "aviators"
-            )
-          ) {
-            setHeadTrait("aviators");
-          } else {
-            setHeadTrait("");
+          if(data.attributes[index].value === "magic"){
+            setisMagic(true)
+          }else{
+            // check for head traits
+            if (
+              data.attributes.some((x: { value: string }) =>
+                x.value.includes("leaf")
+              )
+            ) {
+              setHeadTrait("leaf");
+            } else if (
+              data.attributes.some(
+                (x: { value: string }) => x.value === "goggles"
+              )
+            ) {
+              setHeadTrait("goggles");
+            } else if (
+              data.attributes.some(
+                (x: { value: string }) => x.value === "lodged sushi knife"
+              )
+            ) {
+              setHeadTrait("knife");
+            } else if (
+              data.attributes.some(
+                (x: { value: string }) => x.value === "top hat"
+              )
+            ) {
+              setHeadTrait("top hat");
+            } else if (
+              data.attributes.some(
+                (x: { value: string }) => x.value === "aviators"
+              )
+            ) {
+              setHeadTrait("aviators");
+            } else {
+              setHeadTrait("");
+            }
           }
         }
         setGifDuration(
-          data.attributes[index].value === "mire-able" ? "2" : "2.2"
+          data.attributes[index].value === "mire-able" ? "2" : ( data.attributes[index].value === "magic" ? "" : "2.2")
         );
         setVideoLoading(false);
       });
@@ -230,15 +234,32 @@ const Home: NextPage = () => {
 
     // Run the FFmpeg command-line tool, converting
     // the .mp4 into .gif file
-    await ffmpeg.run(
-      "-i",
-      "video1.mp4",
-      "-t",
-      "2.2",
-      "-vf",
-      gifConfig,
-      "out.gif"
-    );
+    if (gifDuration !== ""){
+      await ffmpeg.run(
+        "-i",
+        "video1.mp4",
+        "-t",
+        // "2.2",
+        gifDuration,
+        "-vf",
+        gifConfig,
+        "out.gif"
+      );
+      
+    }else{
+      console.log("full duration!")
+      await ffmpeg.run(
+        "-i",
+        "video1.mp4",
+        // "-t",
+        // "2.2",
+        // gifDuration,
+        "-vf",
+        gifConfig,
+        "out.gif"
+      );
+      
+    }
     // Read the .gif file back from the FFmpeg file system
     const data = ffmpeg.FS("readFile", "out.gif");
     const url = URL.createObjectURL(
